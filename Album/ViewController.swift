@@ -11,18 +11,37 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let images = ["1", "2", "3", "4", "5", "6", "7"]
+    var images: [UIImage] = []{
+        didSet {
+            guaranteeMainThread {
+                self.collectionView.reloadData()
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         
         navigationController?.navigationBar.backgroundColor = .blue
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        addDefaultImage()
+        addDefaultImage()
+    }
+    
     @IBAction func addButtonClicked(_ sender: Any) {
         showSimpleActionSheet()
+    }
+    
+    private func addDefaultImage() {
+        for i in 1...7 {
+            images.append(UIImage(named: "\(i)")!)
+        }
     }
     
     func showSimpleActionSheet() {
@@ -44,13 +63,15 @@ class ViewController: UIViewController {
         })
     }
     
-    
+    func didFinishPickingPicture(_ image: UIImage) {
+        images.append(image)
+    }
 }
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
+
         let width = collectionView.bounds.width / 3.0 - 16
         let height = width
 
@@ -71,8 +92,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! AlbumCollectionViewCell
-        cell.imageView.image = UIImage(named: "\(images[indexPath.item])")
-        
+        cell.imageView.image = images[indexPath.item]
         return cell
     }
     
@@ -83,9 +103,22 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
+    
+
 }
 
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[.editedImage] as? UIImage {
+            didFinishPickingPicture(image)
+             } else if let image = info[.originalImage] as? UIImage {
+            didFinishPickingPicture(image)
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
     func getImage(fromSourceType sourceType: UIImagePickerController.SourceType){
         if UIImagePickerController.isSourceTypeAvailable(sourceType){
             let imagePickerController = UIImagePickerController()
