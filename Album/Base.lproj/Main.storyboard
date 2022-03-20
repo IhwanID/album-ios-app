@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PiH-TU-vXg">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -38,19 +39,29 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                                     <gestureRecognizers/>
                                                 </imageView>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="play48px" translatesAutoresizingMaskIntoConstraints="NO" id="Vod-i2-kYI">
+                                                    <rect key="frame" x="40" y="40" width="48" height="48"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="48" id="bGe-O4-bxs"/>
+                                                        <constraint firstAttribute="height" constant="48" id="e6R-8t-1pf"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <gestureRecognizers/>
                                             <constraints>
-                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="centerX" secondItem="STi-lb-6L7" secondAttribute="centerX" id="2T4-Xr-8B9"/>
-                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="centerY" secondItem="STi-lb-6L7" secondAttribute="centerY" id="6Pe-rN-sXS"/>
-                                                <constraint firstAttribute="bottom" secondItem="8RW-aw-SXY" secondAttribute="bottom" id="D76-At-rs9"/>
-                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="top" secondItem="STi-lb-6L7" secondAttribute="top" id="M0B-Bw-dtd"/>
-                                                <constraint firstAttribute="trailing" secondItem="8RW-aw-SXY" secondAttribute="trailing" id="U5c-y7-omz"/>
-                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="leading" secondItem="STi-lb-6L7" secondAttribute="leading" id="a9i-ex-ICA"/>
+                                                <constraint firstItem="Vod-i2-kYI" firstAttribute="centerX" secondItem="STi-lb-6L7" secondAttribute="centerX" id="2mj-cT-tFA"/>
+                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="centerY" secondItem="STi-lb-6L7" secondAttribute="centerY" id="AkV-ca-nfD"/>
+                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="leading" secondItem="STi-lb-6L7" secondAttribute="leading" id="KRC-D2-oSf"/>
+                                                <constraint firstAttribute="trailing" secondItem="8RW-aw-SXY" secondAttribute="trailing" id="Vdk-dB-n17"/>
+                                                <constraint firstItem="Vod-i2-kYI" firstAttribute="centerY" secondItem="STi-lb-6L7" secondAttribute="centerY" id="apl-Ol-RUg"/>
+                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="top" secondItem="STi-lb-6L7" secondAttribute="top" id="cWG-rv-TJa"/>
+                                                <constraint firstItem="8RW-aw-SXY" firstAttribute="centerX" secondItem="STi-lb-6L7" secondAttribute="centerX" id="nIR-vy-bi0"/>
+                                                <constraint firstAttribute="bottom" secondItem="8RW-aw-SXY" secondAttribute="bottom" id="ryW-ew-kFu"/>
                                             </constraints>
                                         </collectionViewCellContentView>
                                         <connections>
                                             <outlet property="imageView" destination="8RW-aw-SXY" id="ukj-d3-cmu"/>
+                                            <outlet property="playIcon" destination="Vod-i2-kYI" id="mOG-AM-WiI"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -104,6 +115,7 @@
     </scenes>
     <resources>
         <image name="add" width="24" height="24"/>
+        <image name="play48px" width="48" height="48"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

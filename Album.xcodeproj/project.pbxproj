@@ -64,6 +64,7 @@
 			children = (
 				6071283527E4DA1600EFFEEE /* AppDelegate.swift */,
 				6071283727E4DA1600EFFEEE /* SceneDelegate.swift */,
+				60FE9D4F27E7510D00A2FF99 /* Album.swift */,
 				6071283927E4DA1600EFFEEE /* ViewController.swift */,
 				6071284927E5403400EFFEEE /* AlbumCollectionViewCell.swift */,
 				60FE9D4D27E74C3900A2FF99 /* UIColorExtension.swift */,
@@ -71,7 +72,6 @@
 				6071283E27E4DA1800EFFEEE /* Assets.xcassets */,
 				6071284027E4DA1800EFFEEE /* LaunchScreen.storyboard */,
 				6071284327E4DA1800EFFEEE /* Info.plist */,
-				60FE9D4F27E7510D00A2FF99 /* Album.swift */,
 			);
 			path = Album;
 			sourceTree = "<group>";

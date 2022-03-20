@@ -164,6 +164,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! AlbumCollectionViewCell
         cell.imageView.image = album[indexPath.item].image
+        cell.playIcon.isHidden = !album[indexPath.item].isVideo
         return cell
     }
     
