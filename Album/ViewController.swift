@@ -9,12 +9,15 @@ import UIKit
 import MobileCoreServices
 import AVFoundation
 import CoreMedia
+import AVKit
+
+
 
 class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var images: [UIImage] = []{
+    var album: [Album] = []{
         didSet {
             guaranteeMainThread {
                 self.collectionView.reloadData()
@@ -38,7 +41,8 @@ class ViewController: UIViewController {
     
     private func addDefaultImage() {
         for i in 1...7 {
-            images.append(UIImage(named: "\(i)")!)
+            let image = Album(image: UIImage(named: "\(i)")!, isVideo: false, video: nil)
+            album.append(image)
         }
     }
     
@@ -57,8 +61,9 @@ class ViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func didFinishPickingPicture(_ image: UIImage) {
-        images.append(image)
+    func didFinishPickingPicture(_ image: UIImage, _ isVideo: Bool = false, _ video: URL? = nil) {
+        let data = Album(image: image, isVideo: isVideo, video: video)
+        album.append(data)
     }
     
     private func setupLongGestureRecognizerOnCollection() {
@@ -79,7 +84,7 @@ class ViewController: UIViewController {
             let dialogMessage = UIAlertController(title: "Confirm", message: "Are you sure you want to delete this?", preferredStyle: .alert)
             
             let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
-                self.images.remove(at: indexPath.row)
+                self.album.remove(at: indexPath.row)
             })
             
             let cancel = UIAlertAction(title: "Cancel", style: .cancel)
@@ -98,18 +103,30 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let newImageView = UIImageView(image: images[indexPath.row])
-        newImageView.frame = UIScreen.main.bounds
-        newImageView.backgroundColor = .black
-        newImageView.contentMode = .scaleAspectFit
-        newImageView.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
-        newImageView.addGestureRecognizer(tap)
-        let pinchMethod = UIPinchGestureRecognizer(target: self, action: #selector(pinchImage(sender:)))
-        newImageView.addGestureRecognizer(pinchMethod)
-        self.view.addSubview(newImageView)
-        self.navigationController?.isNavigationBarHidden = true
-        self.tabBarController?.tabBar.isHidden = true
+        if album[indexPath.row].isVideo {
+            
+            let videoURL = album[indexPath.row].video!
+            
+            let player = AVPlayer(url: videoURL as URL)
+            let controller = AVPlayerViewController()
+            controller.player = player
+            present(controller, animated: true) {
+                player.play()
+            }
+        } else {
+            let newImageView = UIImageView(image: album[indexPath.row].image)
+            newImageView.frame = UIScreen.main.bounds
+            newImageView.backgroundColor = .black
+            newImageView.contentMode = .scaleAspectFit
+            newImageView.isUserInteractionEnabled = true
+            let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
+            newImageView.addGestureRecognizer(tap)
+            let pinchMethod = UIPinchGestureRecognizer(target: self, action: #selector(pinchImage(sender:)))
+            newImageView.addGestureRecognizer(pinchMethod)
+            self.view.addSubview(newImageView)
+            self.navigationController?.isNavigationBarHidden = true
+            self.tabBarController?.tabBar.isHidden = true
+        }
     }
     
     @objc func dismissFullscreenImage(_ sender: UITapGestureRecognizer) {
@@ -146,12 +163,12 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! AlbumCollectionViewCell
-        cell.imageView.image = images[indexPath.item]
+        cell.imageView.image = album[indexPath.item].image
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count
+        return album.count
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -180,9 +197,11 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         case kUTTypeMovie:
             let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
             let image = extractFirstFrame(url: videoUrl)
-            didFinishPickingPicture(image)
+            didFinishPickingPicture(image, true, videoUrl)
         default:
-            print("Mismatched type: \(mediaType)")
+            let alert = UIAlertController(title: "Error", message: "Mismatched type: \(mediaType)", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
         
         dismiss(animated: true, completion: nil)
@@ -196,43 +215,17 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
             imagePickerController.mediaTypes = [kUTTypeMovie as String, kUTTypeImage as String]
             self.present(imagePickerController, animated: true, completion: nil)
         } else {
-            print("Source type isn't available")
+            let alert = UIAlertController(title: "Error", message: "Source type isn't available", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
-        func extractFirstFrame (url: URL) -> UIImage
-        {
-             let asset = AVAsset(url: url)
-             let generator = AVAssetImageGenerator.init(asset: asset)
-            let cgImage = try! generator.copyCGImage(at: CMTimeMake(value: 0, timescale: 1), actualTime: nil)
-             return  UIImage(cgImage: cgImage)
-        }
-}
-
-extension UIColor {
-    public convenience init?(hex: String) {
-        let r, g, b, a: CGFloat
-        
-        if hex.hasPrefix("#") {
-            let start = hex.index(hex.startIndex, offsetBy: 1)
-            let hexColor = String(hex[start...])
-            
-            if hexColor.count == 8 {
-                let scanner = Scanner(string: hexColor)
-                var hexNumber: UInt64 = 0
-                
-                if scanner.scanHexInt64(&hexNumber) {
-                    r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
-                    g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
-                    b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
-                    a = CGFloat(hexNumber & 0x000000ff) / 255
-                    
-                    self.init(red: r, green: g, blue: b, alpha: a)
-                    return
-                }
-            }
-        }
-        
-        return nil
+    func extractFirstFrame (url: URL) -> UIImage
+    {
+        let asset = AVAsset(url: url)
+        let generator = AVAssetImageGenerator.init(asset: asset)
+        let cgImage = try! generator.copyCGImage(at: CMTimeMake(value: 0, timescale: 1), actualTime: nil)
+        return  UIImage(cgImage: cgImage)
     }
 }
